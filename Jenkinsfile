@@ -28,10 +28,10 @@ pipeline {
                 -Dsonar.host.url=${env.SONAR_URL} \
                 -Dsonar.login=${SONAR_TOKEN}
                 """
+                } 
                 timeout (time:2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
-                } 
             }
         }
     }
