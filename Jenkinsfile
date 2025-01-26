@@ -16,5 +16,14 @@ pipeline {
                 sh 'mvn clean package -DskipTests=true'
             }
         }
+        stage('sonar scan') {
+            steps {
+                echo "**performing sonar scan***"
+                mvn sonar:sonar \
+                -Dsonar.project=i27-eureka \
+                -Dsonar.host.url=http://34.57.70.242:9000 \
+                -Dsonar.login=squ_dd6a4e93a918b4097cc3feb21d0507fc570c6728
+            }
+        }
     }
 }
