@@ -10,6 +10,10 @@ pipeline {
             APPLICATION_NAME = "eureka"
             SONAR_TOKEN = credentials('sonar-creds')
             SONAR_URL = "http://34.57.70.242:9000"
+            //https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#readmavenpom-read-a-maven-project-file
+            //if any issue with readMaevnPom, make sure install pipeline utility steps plugin
+            POM_VERSION = readMavenPom().getVersion()
+            POM_PACKAGING = readMavenPom().getPackaging()
     }
     stages {
         stage('build') {
@@ -32,6 +36,14 @@ pipeline {
                 timeout (time:2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
+            }
+        }
+        stage('Docker build') {
+            steps {
+                //existing artifcat format: i27-eureka-0.0.1-SNAPSHOT.jar
+                //my destination artifact format: i27-eureka-buildnumber-branchname.jar
+                echo "My Jar source: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
+                echo "My Jar destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
             }
         }
     }
