@@ -14,6 +14,7 @@ pipeline {
             //if any issue with readMaevnPom, make sure install pipeline utility steps plugin
             POM_VERSION = readMavenPom().getVersion()
             POM_PACKAGING = readMavenPom().getPackaging()
+            DOCKER_HUB = "docker.io/venkat315"
     }
     stages {
         stage('build') {
@@ -44,6 +45,12 @@ pipeline {
                 //my destination artifact format: i27-eureka-buildnumber-branchname.jar
                 echo "My Jar source: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
                 echo "My Jar destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
+                sh """
+                echo "****building docker image*****"
+                pwd
+                ls -la
+                docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}
+                # docker.io/venkat315/eureka:
             }
         }
     }
