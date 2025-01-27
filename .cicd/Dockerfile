@@ -11,7 +11,7 @@ WORKDIR /opt/i27/
 ARG JAR_SOURCE
 
 # Copy the JAR File 
-COPY ["${JAR_SOURCE}", "/opt/i27/i27car-eureka.jar"]
+COPY ["${JAR_SOURCE}", "/opt/i27/i27cart-eureka.jar"]
 
 # Grant RWX persmission on this directory 
 RUN chmod 777 /opt/i27/
