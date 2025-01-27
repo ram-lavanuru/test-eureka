@@ -49,6 +49,7 @@ pipeline {
                 echo "****building docker image*****"
                 pwd
                 ls -la
+                cp ${WORKSPACE}/target/${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING} ./cicd
                 docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
                 # docker.io/venkat315/eureka:
                 """
