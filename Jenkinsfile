@@ -9,7 +9,7 @@ pipeline {
     environment {
             APPLICATION_NAME = "eureka"
             SONAR_TOKEN = credentials('sonar-creds')
-            SONAR_URL = "http://35.193.175.156:9000"
+            SONAR_URL = "http://34.173.233.206:9000"
             //https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#readmavenpom-read-a-maven-project-file
             //if any issue with readMaevnPom, make sure install pipeline utility steps plugin
             POM_VERSION = readMavenPom().getVersion()
@@ -30,8 +30,8 @@ pipeline {
                 sh """
                 mvn sonar:sonar \
                 -Dsonar.project=i27-eureka \
-                -Dsonar.host.url=${env.SONAR_URL} \
-                -Dsonar.login=${SONAR_TOKEN}
+                #-Dsonar.host.url=${env.SONAR_URL} \
+                #-Dsonar.login=${SONAR_TOKEN}
                 """
                 } 
                 timeout (time:2, unit: 'MINUTES') {
