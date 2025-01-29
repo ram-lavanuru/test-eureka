@@ -85,5 +85,31 @@ pipeline {
                     }
                     
                 }
+        stage('Deploy to test') {
+            steps {
+                echo "**deploying to test server****"
+                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    script {
+                        sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
+                        try {
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-test"
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-test"
+                        }
+                        catch(err) {
+                            echo "Error Caught: $err"
+                        }
+
+                        //deploy to dev
+
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-test -p 5761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+                        
+                        }
+
+
+                        }
+                    }
+                    
+                }
+                
             }
         }
