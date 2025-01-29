@@ -60,5 +60,13 @@ pipeline {
                 """
             }
         }
+        stage('Deploy to dev') {
+            steps {
+                echo "**deploying to dev server****"
+                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@dev_ip \"hostname -i\""
+                }
+            }
+        }
     }
 }
