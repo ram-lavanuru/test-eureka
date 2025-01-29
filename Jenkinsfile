@@ -64,7 +64,7 @@ pipeline {
             steps {
                 echo "**deploying to dev server****"
                 withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip "hostname -i"'
+                    sh 'sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip "docker run -dit --name i27-${env.APPLICATION_NAME}-dev -p 5761:8761${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}"'
                 }
             }
         }
