@@ -20,6 +20,6 @@ RUN chmod 777 /opt/i27/
 EXPOSE 8761
 
 # Specify the command to run the Spring Based application using the JAVA JAR File
-CMD ["java", "-jar", "/opt/i27/i27car-eureka.jar"]
+CMD ["java", "-jar", "/opt/i27/i27cart-eureka.jar"]
 
 # CMD ["java", "-jar", "/*.jar"]
