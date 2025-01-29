@@ -55,7 +55,7 @@ pipeline {
                 docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
                 # docker.io/venkat315/eureka:
                 echo "********login to doker registry****"
-                docker login -u ${DOCKER-CREDS_USR} -p ${DOCKER-CREDS_PSW}
+                docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
                 docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
                 """
             }
