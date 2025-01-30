@@ -148,7 +148,6 @@ pipeline {
                     anyOf {
                         expression {
                             branch = 'release/*'
-                            branch = 'main/*'
                         }
                     }
                 }
