@@ -64,6 +64,7 @@ pipeline {
         stage('Deploy to dev') {
             steps {
                 script {
+                    echo ***deploying to dev****
                     dockerDeploy(dev, 5761, 8761).call()
                 }
                     }
