@@ -8,8 +8,8 @@ pipeline {
     }
     environment {
             APPLICATION_NAME = "eureka"
-            SONAR_TOKEN = credentials('sonar-creds')
-            SONAR_URL = "http://34.173.233.206:9000"
+            // SONAR_TOKEN = credentials('sonar-creds')
+            // SONAR_URL = "http://34.173.233.206:9000"
             //https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#readmavenpom-read-a-maven-project-file
             //if any issue with readMaevnPom, make sure install pipeline utility steps plugin
             POM_VERSION = readMavenPom().getVersion()
@@ -62,108 +62,65 @@ pipeline {
         }
         stage('Deploy to dev') {
             steps {
-                echo "**deploying to dev server****"
-                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
-                        try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-dev"
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-dev"
-                        }
-                        catch(err) {
-                            echo "Error Caught: $err"
-                        }
-
-                        //deploy to dev
-
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-dev -p 5761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                        
-                        }
-
-
-                        }
+                script {
+                    dockerDeploy(dev, 5761, 8761)
+                }
                     }
                     
                 }
         stage('Deploy to test') {
             steps {
-                echo "**deploying to test server****"
-                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
-                        try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-test"
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-test"
-                        }
-                        catch(err) {
-                            echo "Error Caught: $err"
-                        }
-
-                        //deploy to dev
-
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-test -p 6761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                        
-                        }
-
-
-                        }
+                script {
+                    dockerDeploy(tst, 6761, 8761)
+                }
                     }
                     
                 }
         stage('Deploy to stage') {
             steps {
-                echo "**deploying to stage server****"
-                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
-                        try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-stg"
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-stg"
-                        }
-                        catch(err) {
-                            echo "Error Caught: $err"
-                        }
-
-                        //deploy to dev
-
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-stg -p 7761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                        
-                        }
-
-
-                        }
+                script {
+                    dockerDeploy(stg, 7761, 8761)
+                }
                     }
                     
                 }
 
         stage('Deploy to prod') {
             steps {
-                echo "**deploying to prod server****"
-                withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
-                        try {
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-prd"
-                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-prd"
-                        }
-                        catch(err) {
-                            echo "Error Caught: $err"
-                        }
-
-                        //deploy to dev
-
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-prd -p 8761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
-                        
-                        }
-
-
-                        }
+                script {
+                    dockerDeploy(prd, 8761, 8761)
+                }
                     }
                     
                 }
                 
             }
         }
-                
+
+              
+  def dockerDeploy(envDeploy, hostPort, containerPort) {
+    return {
+      echo "**deploying to $envDeploy server****"
+        withCredentials([usernamePassword(credentialsId: 'ram-docker-vm-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            script {
+            sh "sshpass -p $PASSWORD -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\""
+            try {
+                sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-$envDeploy"
+                sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-$envDeploy"
+            }
+            catch(err) {
+                echo "Error Caught: $err"
+            }
+
+            //deploy to dev
+
+            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker run -dit --name ${env.APPLICATION_NAME}-$envDeploy -p $hostPort:$containerPort ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
+            
+            }
+
+
+        } 
+    }
+  }
             
         
