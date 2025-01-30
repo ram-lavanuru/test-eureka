@@ -160,8 +160,15 @@ pipeline {
 
         stage('Deploy to prod') {
             when {
-                expression {
+                allOf {
+                    anyOf {
+                    expression {
                     params.deployToProd == 'yes'
+                }
+                    }
+                    anyOf {
+                        tag pattern: "v\\d{1,2}\\.\\d{1,2}\\.\\d{1,2}, comparator: "REGEXP""
+                    }
                 }
             }
             steps {
