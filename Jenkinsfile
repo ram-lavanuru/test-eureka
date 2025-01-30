@@ -2,6 +2,37 @@ pipeline {
     agent {
         label 'k8s-slave'
     }
+    parameters {
+        choice(name: 'scanOnly',
+               choices: 'yes\nno',
+               description: 'this will scan your application'
+               )
+        choice(name: 'buildOnly',
+               choices: 'yes\nno',
+               description: 'this is for build only'
+               )
+        choice(name: 'dockerPush',
+               choices: 'yes\nno',
+               description: 'this is docker build and docker push'
+               )
+        choice(name: 'deployToDev',
+            choices: 'yes\nno',
+            description: 'thi is deploy to dev env'
+            )
+        choice(name: 'deployToTest',
+            choices: 'yes\nno',
+            description: 'thi is deploy to test env'
+            )
+        choice(name: 'deployToStage',
+            choices: 'yes\nno',
+            description: 'thi is deploy to stage env'
+            )
+        choice(name: 'deployToProd',
+            choices: 'yes\nno',
+            description: 'thi is deploy to prod env'
+            )
+               
+    }
     tools {
         maven 'Maven-3.8.8'
         jdk 'JDK-17'
@@ -20,6 +51,14 @@ pipeline {
     }
     stages {
         stage('build') {
+        when {
+            anyOf {
+                expression {
+                    params.dockerPush == 'yes'
+                    params.buildOnly == 'yes'
+                }
+            }
+        }
             steps {
                 script {
                     build().call()
@@ -27,6 +66,15 @@ pipeline {
             }
         }
         stage('sonar scan') {
+            when {
+                anyOf {
+                    expression {
+                        params.scanOnly == 'yes'
+                        params.buildOnly == 'yes'
+                        params.dockerPush == 'yes'
+                    }
+                }
+            }
             steps {
                 echo "**performing sonar scan***"
                 withSonarQubeEnv('SonarQube') {  //SonarQube is same as the name system under manage jenkins
@@ -44,6 +92,13 @@ pipeline {
             }
         }
         stage('Docker build') {
+            when {
+                anyOf {
+                    expression {
+                        params.dockerPush == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     dockerBuild().call()
@@ -51,6 +106,11 @@ pipeline {
             }
         }
         stage('Deploy to dev') {
+            when {
+                expression {
+                    params.deployToDev == 'yes'
+                }
+            }
             steps {
                 script {
                     dockerDeploy('dev', '5761', '8761').call()
@@ -59,6 +119,11 @@ pipeline {
                     
                 }
         stage('Deploy to test') {
+            when {
+                expression {
+                    params.deployToTest == 'yes'
+                }
+            }
             steps {
                 script {
                     dockerDeploy('tst', '6761', '8761').call()
@@ -67,6 +132,11 @@ pipeline {
                     
                 }
         stage('Deploy to stage') {
+            when {
+                expression {
+                    deployToStage == 'yes'
+                }
+            }
             steps {
                 script {
                     dockerDeploy('stg', '7761', '8761').call()
@@ -76,6 +146,11 @@ pipeline {
                 }
 
         stage('Deploy to prod') {
+            when {
+                expression {
+                    deployToProd == 'yes'
+                }
+            }
             steps {
                 script {
                     dockerDeploy('prd', '8761', '8761').call()
