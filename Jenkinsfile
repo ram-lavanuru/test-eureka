@@ -64,7 +64,7 @@ pipeline {
         stage('Deploy to dev') {
             steps {
                 script {
-                    dockerDeploy(dev, 5761, 8761).call()
+                    dockerDeploy('dev', '5761', '8761').call()
                 }
                     }
                     
@@ -72,7 +72,7 @@ pipeline {
         stage('Deploy to test') {
             steps {
                 script {
-                    dockerDeploy(tst, 6761, 8761).call()
+                    dockerDeploy('tst', '6761', '8761').call()
                 }
                     }
                     
@@ -80,7 +80,7 @@ pipeline {
         stage('Deploy to stage') {
             steps {
                 script {
-                    dockerDeploy(stg, 7761, 8761).call()
+                    dockerDeploy('stg', '7761', '8761').call()
                 }
                     }
                     
