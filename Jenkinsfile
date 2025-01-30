@@ -142,12 +142,11 @@ pipeline {
                     anyOf {
                         expression {
                         params.deployToStage == 'yes'
-                        //other condition
                         }
                     }
                     anyOf {
                         expression {
-                            branch = 'release/*'
+                            branch 'release/*'
                         }
                     }
                 }
