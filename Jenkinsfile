@@ -67,13 +67,16 @@ pipeline {
         }
         stage('sonar scan') {
             when {
-                anyOf {
-                    expression {
-                        params.scanOnly == 'yes'
-                        params.buildOnly == 'yes'
-                        params.dockerPush == 'yes'
-                    }
+                expression {
+                    params.scanOnly == 'yes'
                 }
+                // anyOf {
+                //     expression {
+                //         params.scanOnly == 'yes'
+                //         params.buildOnly == 'yes'
+                //         params.dockerPush == 'yes'
+                //     }
+                // }
             }
             steps {
                 echo "**performing sonar scan***"
