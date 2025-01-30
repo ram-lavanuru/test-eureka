@@ -140,8 +140,10 @@ pipeline {
             when {
                 allOf {
                     anyOf {
+                        expression {
                         params.deployToStage == 'yes'
                         //other condition
+                        }
                     }
                     anyOf {
                         expression {
