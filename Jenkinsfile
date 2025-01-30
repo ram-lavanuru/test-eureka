@@ -138,9 +138,6 @@ pipeline {
                 }
         stage('Deploy to stage') {
             when {
-                // expression {
-                //     params.deployToStage == 'yes'
-                // }
                 allOf {
                     anyOf {
                         params.deployToStage == 'yes'
@@ -149,6 +146,7 @@ pipeline {
                     anyOf {
                         expression {
                             branch = 'release/*'
+                            branch = 'main/*'
                         }
                     }
                 }
