@@ -29,6 +29,7 @@ pipeline {
             steps {
                 echo "**performing sonar scan***"
                 withSonarQubeEnv('SonarQube') {  //SonarQube is same as the name system under manage jenkins
+                sh 'env | grep SONAR'
                 sh """
                 mvn sonar:sonar \
                 -Dsonar.project=i27-eureka \
