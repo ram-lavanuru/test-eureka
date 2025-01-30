@@ -138,8 +138,19 @@ pipeline {
                 }
         stage('Deploy to stage') {
             when {
-                expression {
-                    params.deployToStage == 'yes'
+                // expression {
+                //     params.deployToStage == 'yes'
+                // }
+                allOf {
+                    anyOf {
+                        params.deployToStage == 'yes'
+                        //other condition
+                    }
+                    anyOf {
+                        expression {
+                            branch = 'release/*'
+                        }
+                    }
                 }
             }
             steps {
@@ -174,7 +185,7 @@ def imageValidation() {
         println ("attempting to pull the docker image")      
 
         try {
-        sh "docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}"
+        sh "docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}"
         println ("image pulled successfully")
         }
 
