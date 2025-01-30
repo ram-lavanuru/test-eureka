@@ -134,7 +134,7 @@ pipeline {
         stage('Deploy to stage') {
             when {
                 expression {
-                    deployToStage == 'yes'
+                    params.deployToStage == 'yes'
                 }
             }
             steps {
@@ -148,7 +148,7 @@ pipeline {
         stage('Deploy to prod') {
             when {
                 expression {
-                    deployToProd == 'yes'
+                    params.deployToProd == 'yes'
                 }
             }
             steps {
