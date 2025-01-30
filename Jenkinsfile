@@ -4,31 +4,31 @@ pipeline {
     }
     parameters {
         choice(name: 'scanOnly',
-               choices: 'yes\nno',
+               choices: 'no\nyes',
                description: 'this will scan your application'
                )
         choice(name: 'buildOnly',
-               choices: 'yes\nno',
+               choices: 'no\nyes',
                description: 'this is for build only'
                )
         choice(name: 'dockerPush',
-               choices: 'yes\nno',
+               choices: 'no\nyes',
                description: 'this is docker build and docker push'
                )
         choice(name: 'deployToDev',
-            choices: 'yes\nno',
+            choices: 'no\nyes',
             description: 'thi is deploy to dev env'
             )
         choice(name: 'deployToTest',
-            choices: 'yes\nno',
+            choices: 'no\nyes',
             description: 'thi is deploy to test env'
             )
         choice(name: 'deployToStage',
-            choices: 'yes\nno',
+            choices: 'no\nyes',
             description: 'thi is deploy to stage env'
             )
         choice(name: 'deployToProd',
-            choices: 'yes\nno',
+            choices: 'no\nyes',
             description: 'thi is deploy to prod env'
             )
                
