@@ -21,8 +21,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                echo "*****builiding the ${env.APPLICATION_NAME} application"
-                sh 'mvn clean package -DskipTests=true'
+                script {
+                    build().call()
+                }
             }
         }
         stage('sonar scan') {
@@ -44,21 +45,9 @@ pipeline {
         }
         stage('Docker build') {
             steps {
-                //existing artifcat format: i27-eureka-0.0.1-SNAPSHOT.jar
-                //my destination artifact format: i27-eureka-buildnumber-branchname.jar
-                echo "My Jar source: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                echo "My Jar destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
-                sh """
-                echo "****building docker image*****"
-                pwd
-                ls -la
-                cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd
-                docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
-                # docker.io/venkat315/eureka:
-                echo "********login to doker registry****"
-                docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
-                docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
-                """
+                script {
+                    dockerBuild().call()
+                }
             }
         }
         stage('Deploy to dev') {
@@ -89,7 +78,7 @@ pipeline {
         stage('Deploy to prod') {
             steps {
                 script {
-                    dockerDeploy(prd, 8761, 8761).call()
+                    dockerDeploy('prd', '8761', '8761').call()
                 }
                     }
                     
@@ -98,6 +87,31 @@ pipeline {
             }
         }
 
+
+def build() {
+    return {
+        echo "*****builiding the ${env.APPLICATION_NAME} application"
+        sh 'mvn clean package -DskipTests=true'
+    }
+}
+
+
+def dockerBuild() {
+    return {
+    echo "My Jar source: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
+    echo "My Jar destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
+    sh """
+    echo "****building docker image*****"
+    pwd
+    ls -la
+    cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} ./.cicd
+    docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
+    echo "********login to doker registry****"
+    docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
+    docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+    """
+    }
+}
               
   def dockerDeploy(envDeploy, hostPort, containerPort) {
     return {
