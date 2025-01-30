@@ -171,11 +171,13 @@ pipeline {
 
 def imageValidation {
     return {
+        println ("attempting to pull the docker image")      
+
         try {
-        println ("attempting to pull the docker image")
-        sh "docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\"
+        sh "docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}"
         println ("image pulled successfully")
         }
+
         catch(Exception e) {
         println ("opps! image not there,creating a new image")
         build().call()
