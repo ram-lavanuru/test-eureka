@@ -9,7 +9,7 @@ pipeline {
                )
         choice(name: 'buildOnly',
                choices: 'no\nyes',
-               description: 'this is for build only'
+               description: 'this is for build onliy'
                )
         choice(name: 'dockerPush',
                choices: 'no\nyes',
