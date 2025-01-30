@@ -116,6 +116,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()
                     dockerDeploy('dev', '5761', '8761').call()
                 }
                     }
@@ -129,6 +130,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()
                     dockerDeploy('tst', '6761', '8761').call()
                 }
                     }
@@ -142,6 +144,7 @@ pipeline {
             }
             steps {
                 script {
+                    imageValidation().call()
                     dockerDeploy('stg', '7761', '8761').call()
                 }
                     }
@@ -165,6 +168,22 @@ pipeline {
             }
         }
 
+
+def imageValidation {
+    return {
+        try {
+        println ("attempting to pull the docker image")
+        sh "docker pull ${env.DOCKER_HUB}/${APPLICATION_NAME}:${GIT_COMMIT}\"
+        println ("image pulled successfully")
+        }
+        catch(Exception e) {
+        println ("opps! image not there,creating a new image")
+        build().call()
+        dockerBuild().call()        
+        }
+
+    }
+}
 
 def build() {
     return {
