@@ -173,7 +173,7 @@ pipeline {
             }
             steps {
                 script {
-                    timeout(time:300 unit:SECONDS) {
+                    timeout(time:3000 unit:SECONDS) {
                         input message: "deploying  ${APPLICATION_NAME} to prod, is it okay??", ok: 'yes', submitter: 'ram'
                     }
                     
