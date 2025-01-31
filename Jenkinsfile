@@ -172,6 +172,9 @@ pipeline {
                 }
             }
             steps {
+                    timeout(time:30000 unit:SECONDS) {
+                        input message: "deploying  ${APPLICATION_NAME} to prod, is it okay??", ok: 'yes', submitter: 'ram'
+                    }
                 script {
                     dockerDeploy('prd', '8761', '8761').call()
                 }
