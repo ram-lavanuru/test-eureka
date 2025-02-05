@@ -8,6 +8,6 @@
 
 
 @Library("com.i27academy.slb@main")_
-firstPipeline(
+dockerPipeline(
     appName: 'eureka'
 )
