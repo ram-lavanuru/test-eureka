@@ -32,3 +32,22 @@ spec:
       targetPort: 8761
   # type: ClusterIP
   type: NodePort
+
+---
+# Create a ingress for eureka-dev.i27carts.in
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: i27-eureka-dev-ingress
+spec:
+  rules:
+  - host: eureka-dev.vishnuapple.in
+    http:
+      paths: 
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: i27-eureka-dev-svc
+            port:
+              number: 80
